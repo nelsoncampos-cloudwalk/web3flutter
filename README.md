@@ -17,3 +17,9 @@ This plugin asbtract web3 implementation and make your life more easier.
 - [x] GetWeb3TransactionInformation
 - [x] ReadContract
 - [x] WriteOnContract
+
+## Routines
+Routines was created to intrgrate 2 or more use cases.
+
+- [x] WriteOnContractRoutine -> Deploy your contract and Write on contract
+- [x] ReadContractRoutine -> Deploy your contract and Read your contract
