@@ -2,7 +2,7 @@
 
 This plugin asbtract web3 implementation and make your life more easier.
 
-## ToDoCancelWeb3TransactionImpl
+## ToDo
 - [ ] Exemple
 - [ ] Unit test
 - [ ] Documentation
