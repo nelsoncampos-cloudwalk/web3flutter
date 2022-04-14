@@ -3,17 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart' as crypto;
-import 'package:web3flutter/web3/data/model/transaction_info_response.dart';
 
 typedef TransactionEvent = void Function(List<dynamic>);
 
-class Web3Service {
+class Web3Flutter {
   final Client client;
   final String? privateKey;
   final String publicKey;
   late Web3Client web3;
 
-  Web3Service({
+  Web3Flutter({
     required this.client,
     required String url,
     required this.publicKey,
@@ -22,6 +21,7 @@ class Web3Service {
     web3 = Web3Client(url, client);
   }
 
+  ///Get [publickey] and convert to a readable address to web3dart
   EthereumAddress get address {
     final publicKeyBytes = crypto.hexToBytes(
       publicKey.substring(2, publicKey.length),
@@ -49,8 +49,12 @@ class Web3Service {
     }
   }
 
+  ///Get the balance of the main token in the network
   Future<double> getBalance({
+    ///Select the type of unit you want to receive
     EtherUnit unit = EtherUnit.ether,
+
+    ///If you want you can get the balance of a especific block
     BlockNum? atBlock,
   }) async {
     final EtherAmount balance = await web3.getBalance(
@@ -60,6 +64,8 @@ class Web3Service {
     return balance.getValueInUnit(unit);
   }
 
+  ///Gets the amount of transactions issued by the specified [address].
+  ///This function allows specifying a custom block mined in the past to get historical data. By default, [BlockNum.current] will be used.
   Future<int> getTransactionCount({BlockNum? atBlock}) async {
     final int count = await web3.getTransactionCount(address);
     return count;

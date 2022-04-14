@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:web3flutter/web3flutter.dart';
+import 'package:web3flutter/src/web3flutter.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('web3flutter');
