@@ -7,22 +7,24 @@ import 'package:web3dart/crypto.dart' as crypto;
 typedef TransactionEvent = void Function(List<dynamic>);
 
 class Web3Flutter {
-  final Client client;
   final String? privateKey;
   final String publicKey;
-  late Web3Client web3;
+  final String url;
+  late final Web3Client web3;
 
   Web3Flutter({
-    required this.client,
-    required String url,
+    required this.url,
     required this.publicKey,
     this.privateKey,
   }) {
-    web3 = Web3Client(url, client);
+    web3 = Web3Client(url, Client());
   }
 
   ///Get [publickey] and convert to a readable address to web3dart
   EthereumAddress get address {
+    if (publicKey.startsWith('0x')) {
+      return EthereumAddress.fromHex(publicKey);
+    }
     final publicKeyBytes = crypto.hexToBytes(
       publicKey.substring(2, publicKey.length),
     );
@@ -71,6 +73,7 @@ class Web3Flutter {
     return count;
   }
 
+  ///Create a [DeployedContract] to help call the contracts
   Future<DeployedContract> deployContract({
     required String abiPath,
     required String contractName,
@@ -146,17 +149,26 @@ class Web3Flutter {
     });
   }
 
-  Future<TransactionInfoResponse?> writeOnContract(
+  Future<String> writeOnContract(
+    ///Function name from contract that you will write
     String functionName,
     List<dynamic> args, {
     required DeployedContract contract,
     required int gasPrice,
+
+    ///Event name that you want listen
     required String eventName,
+
+    ///the id from blockchain where your smart contract is deployed
     required int chainId,
     int? maxGas,
     required int minGasPrice,
     required int maxGasPrice,
+
+    ///Callback when trasaction have completed
     required TransactionEvent onTransaction,
+
+    ///Callback when trasaction had some error
     required Function onError,
   }) async {
     assert(privateKey == null);
@@ -191,12 +203,7 @@ class Web3Flutter {
       ),
       chainId: chainId,
     );
-    return TransactionInfoResponse(
-      nonce: nonce,
-      gasPrice: gasPrice,
-      transactionHash: transactionHash,
-      maxGas: maxGas,
-    );
+    return transactionHash;
   }
 
   Future<TransactionInformation> getTransactionInformation({

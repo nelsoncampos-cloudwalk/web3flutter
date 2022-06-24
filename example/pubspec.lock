@@ -134,20 +134,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.2"
-  dartz:
-    dependency: transitive
-    description:
-      name: dartz
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.10.1"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -186,13 +172,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  get_it:
-    dependency: transitive
-    description:
-      name: get_it
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "7.2.0"
   glob:
     dependency: transitive
     description:
@@ -200,13 +179,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  hex:
-    dependency: transitive
-    description:
-      name: hex
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   http:
     dependency: transitive
     description:

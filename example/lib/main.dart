@@ -1,8 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:web3flutter/web3flutter.dart';
+import 'smart_contracts/brlc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,34 +15,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  final web3 = Web3Flutter(
+    url: 'https://rpc.mainnet.cloudwalk.io',
+    publicKey: '0x75A9A96C4870eF0F269e653A25A3ff4De8F5C171',
+  );
+
+  double balance = 0;
+  String owner = '';
+  String symbol = '';
+  late final Brlc brlc;
 
   @override
   void initState() {
+    brlc = Brlc(web3: web3);
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await Web3flutter.platformVersion ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -51,10 +36,30 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Web3Flutter'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(balance.toString()),
+            ),
+            Center(
+              child: Text(owner),
+            ),
+            Center(
+              child: Text(symbol),
+            ),
+            CupertinoButton(
+              child: const Text('Contract'),
+              onPressed: () async {
+                balance = await brlc.balanceOf(account: web3.address);
+                owner = (await brlc.owner()).hex;
+                symbol = await brlc.symbol();
+                setState(() {});
+              },
+            ),
+          ],
         ),
       ),
     );
