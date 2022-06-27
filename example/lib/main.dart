@@ -53,9 +53,9 @@ class _MyAppState extends State<MyApp> {
             CupertinoButton(
               child: const Text('Contract'),
               onPressed: () async {
-                balance = await brlc.balanceOf(account: web3.address);
-                owner = (await brlc.owner()).hex;
-                symbol = await brlc.symbol();
+                // balance = await brlc.balanceOf(account: web3.address);
+                // owner = (await brlc.owner()).hex;
+                // symbol = await brlc.symbol();
                 setState(() {});
               },
             ),

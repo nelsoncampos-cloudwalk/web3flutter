@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart' as crypto;
+import 'package:web3flutter/web3flutter.dart';
 
 typedef TransactionEvent = void Function(List<dynamic>);
 
@@ -124,37 +125,14 @@ class Web3Flutter {
     return hash;
   }
 
-  void listenContractEvent(
-    DeployedContract contract,
-    String event,
-    String publicKey, {
-    required TransactionEvent onTransaction,
-  }) {
-    ContractEvent transactionEvent = contract.event(event);
-    final events = web3.events(
-      FilterOptions.events(
-        contract: contract,
-        event: transactionEvent,
-      ),
-    );
-    events.listen((event) {
-      final decodedResults = transactionEvent.decodeResults(
-        event.topics ?? <String>[],
-        event.data ?? '',
-      );
-      final from = decodedResults[0] as EthereumAddress;
-      if (from.hex == publicKey) {
-        onTransaction(decodedResults);
-      }
-    });
-  }
-
-  Future<String> writeOnContract(
+  Future<AfterTransaction?> writeOnContract(
     ///Function name from contract that you will write
     String functionName,
     List<dynamic> args, {
     required DeployedContract contract,
-    required int gasPrice,
+
+    ///How much ether to spend on a single unit of gas. Can be null, in which case the rpc server will choose this value.
+    int? gasPrice,
 
     ///Event name that you want listen
     required String eventName,
@@ -162,8 +140,8 @@ class Web3Flutter {
     ///the id from blockchain where your smart contract is deployed
     required int chainId,
     int? maxGas,
-    required int minGasPrice,
-    required int maxGasPrice,
+    int? minGasPrice,
+    int? maxGasPrice,
 
     ///Callback when trasaction have completed
     required TransactionEvent onTransaction,
@@ -176,34 +154,42 @@ class Web3Flutter {
     final contractFunction = contract.function(functionName);
     final credentials = EthPrivateKey.fromHex(privateKey!);
     final nonce = await getTransactionCount();
+    final transactionEvent = contract.event(eventName);
 
-    listenContractEvent(
-      contract,
-      eventName,
-      (await credentials.extractAddress()).hex,
-      onTransaction: (result) {
-        onTransaction(result);
-      },
-    );
-
-    final transactionHash = await web3.sendTransaction(
+    final tx = await web3.sendTransaction(
       credentials,
       Transaction.callContract(
         contract: contract,
         function: contractFunction,
         parameters: args,
-        gasPrice: gasPrice != -1
-            ? EtherAmount.fromUnitAndValue(
-                EtherUnit.gwei,
-                _gasPrice(gasPrice, maxGasPrice, minGasPrice),
+        gasPrice: gasPrice != null
+            ? EtherAmount.inWei(
+                BigInt.from(gasPrice),
               )
             : null,
-        maxGas: maxGas ?? 24000,
+        maxGas: maxGas,
         nonce: nonce,
       ),
       chainId: chainId,
     );
-    return transactionHash;
+
+    final events = web3.events(
+      FilterOptions.events(contract: contract, event: transactionEvent),
+    );
+
+    AfterTransaction? afterTransaction;
+
+    await for (final event in events) {
+      afterTransaction = AfterTransaction(
+        tx: tx,
+        result: transactionEvent.decodeResults(
+          event.topics ?? [],
+          event.data ?? '',
+        ),
+      );
+    }
+
+    return afterTransaction;
   }
 
   Future<TransactionInformation> getTransactionInformation({
@@ -250,4 +236,11 @@ class Web3Flutter {
   //   return BlockchainWallet.fromJson(json);
   // }
 
+}
+
+class AfterTransaction {
+  final String tx;
+  final List<dynamic> result;
+
+  AfterTransaction({required this.tx, required this.result});
 }
