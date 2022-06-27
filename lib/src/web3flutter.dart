@@ -32,24 +32,6 @@ class Web3Flutter {
     return EthereumAddress.fromHex(publicKeyAddress);
   }
 
-  int _gasPrice(
-    int gasPrice,
-    int maxGasPrice,
-    int minGasPrice,
-  ) {
-    if (gasPrice != -1) {
-      if (gasPrice > maxGasPrice) {
-        return maxGasPrice;
-      } else if (gasPrice < minGasPrice) {
-        return minGasPrice;
-      } else {
-        return gasPrice;
-      }
-    } else {
-      return gasPrice;
-    }
-  }
-
   ///Get the balance of the main token in the network
   Future<double> getBalance({
     ///Select the type of unit you want to receive
