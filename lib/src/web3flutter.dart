@@ -142,12 +142,6 @@ class Web3Flutter {
     int? maxGas,
     int? minGasPrice,
     int? maxGasPrice,
-
-    ///Callback when trasaction have completed
-    required TransactionEvent onTransaction,
-
-    ///Callback when trasaction had some error
-    required Function onError,
   }) async {
     assert(privateKey == null);
 
