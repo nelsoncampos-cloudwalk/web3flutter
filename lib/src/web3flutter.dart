@@ -5,8 +5,6 @@ import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/crypto.dart' as crypto;
 import 'package:web3flutter/web3flutter.dart';
 
-typedef TransactionEvent = void Function(List<dynamic>);
-
 class Web3Flutter {
   final String? privateKey;
   final String publicKey;
